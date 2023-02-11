@@ -38,6 +38,11 @@ This project displays the current internet status on a Display Hat Mini 2.0, usi
    sudo systemctl start internet-status.service
     ```
 
+## Voila
+
+The Display Hat Mini should now display the current internet status. If the internet is connected, the display will show a green sentence stating that the Wi-Fi is up and if the internet is not connected, the display will show a red sentence stating that the Wi-Fi is down.
+[![Internet Status Display](will be added later)]
+
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
