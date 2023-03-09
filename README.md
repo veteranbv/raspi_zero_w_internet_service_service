@@ -46,6 +46,9 @@ The Display Hat Mini should now display the current internet status. If the inte
   <img src="https://github.com/veteranbv/raspi_zero_w_internet_service_service/blob/46ae5225b7b44de5194becf87704e6d44908cae8/WiFi-is-Up_lowres.jpeg">
 </p>
 
+## Resources
+<!-- Insert a link with title -->
+- [Pimoroni Display Hat Mini](https://pinout.xyz/pinout/display_hat_mini)
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
