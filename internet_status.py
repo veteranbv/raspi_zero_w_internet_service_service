@@ -1,3 +1,8 @@
+#!/usr/bin/env python3
+
+# App to display the current internet connection status, chart the signal 
+# strenth, and display network info on a Pimoroni Display Hat Mini 2.0
+
 import socket
 import time
 import subprocess
@@ -10,6 +15,17 @@ import ST7789
 import datetime
 from io import BytesIO
 import tempfile
+import logging
+from logging.handlers import RotatingFileHandler
+
+log_formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+log_file = 'internet_status.log'
+log_handler = RotatingFileHandler(log_file, maxBytes=1024*1024, backupCount=1)  # 1 MB file size limit
+log_handler.setFormatter(log_formatter)
+
+logger = logging.getLogger()
+logger.setLevel(logging.INFO)
+logger.addHandler(log_handler)
 
 SAMPLE_INTERVAL_SECONDS = 300  # 5 minutes
 SAMPLES_PER_HOUR = int(3600 / SAMPLE_INTERVAL_SECONDS)
@@ -76,6 +92,7 @@ def calculate_average_signal_strength(interval_hours):
 WIDTH = 320
 HEIGHT = 240
 
+# Initialize Pimoroni Display Hat Mini 2.0
 def init_display():
     disp = ST7789.ST7789(
         height=HEIGHT,
@@ -120,7 +137,7 @@ def gather_network_info():
                     if "Link Quality" in line:
                         network_info["signal_strength"] = line.split("Signal level=")[1].split(" ")[0]
     except Exception as e:
-        print(f"Error gathering network info: {e}")
+        logging.error(f"Error gathering network info: {e}")
 
     return network_info
 
@@ -153,7 +170,7 @@ def display_wifi_status(disp, connected, network_info):
 # Button callbacks
 def button_a_callback(channel):
     global refresh_display, current_screen, show_graph
-    print("Button A pressed")
+    logging.info("Button A pressed")
     current_screen = "network_info" if current_screen == "default" else "default"
     refresh_display = True
     if current_screen == "default":
@@ -162,14 +179,14 @@ def button_a_callback(channel):
 
 def button_b_callback(channel):
     global current_color_theme_index, refresh_display
-    print("Button B pressed")
+    logging.info("Button B pressed")
     current_color_theme_index = (current_color_theme_index + 1) % len(COLOR_THEMES)
     refresh_display = True
     time.sleep(0.2)
 
 def button_x_callback(channel):
     global current_time_interval_index, refresh_display, show_graph, current_screen
-    print("Button X pressed")
+    logging.info("Button X pressed")
     current_time_interval_index = (current_time_interval_index + 1) % len(TIME_INTERVALS)
     if current_screen == "network_info":
         current_screen = "default"
@@ -179,7 +196,7 @@ def button_x_callback(channel):
 
 def button_y_callback(channel):
     global refresh_display
-    print("Button Y pressed")
+    logging.info("Button Y pressed")
     refresh_display = True
     time.sleep(0.2)
 
@@ -249,7 +266,7 @@ def main():
     try:
         connected = check_connection()
     except Exception as e:
-        print(f"Error checking connection: {e}")
+        logging.error(f"Error checking connection: {e}")
         connected = False
     display_wifi_status(disp, connected, network_info)
 
@@ -258,12 +275,12 @@ def main():
 
     while True:
         if refresh_display:
-            print(f"Refreshing display - current_screen: {current_screen}")
+            logging.info(f"Refreshing display - current_screen: {current_screen}")
             if current_screen == "default":
                 try:
                     connected = check_connection()
                 except Exception as e:
-                    print(f"Error checking connection: {e}")
+                    logging.error(f"Error checking connection: {e}")
                     connected = False
                 network_info = gather_network_info()
                 display_wifi_status(disp, connected, network_info)
@@ -284,6 +301,6 @@ if __name__ == "__main__":
     try:
         main()
     except KeyboardInterrupt:
-        print("\nExiting...")
+        logging.info("\nExiting...")
     finally:
         GPIO.cleanup()
